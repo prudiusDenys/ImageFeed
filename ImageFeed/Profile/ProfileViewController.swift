@@ -1,6 +1,10 @@
 import UIKit
 
 final class ProfileViewController: UIViewController {
+    lazy var userName = UILabel()
+    lazy var email = UILabel()
+    lazy var text = UILabel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -14,10 +18,6 @@ final class ProfileViewController: UIViewController {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "logoutIcon"), for: .normal)
         button.addTarget(self, action: #selector(Self.didTapButton), for: .touchUpInside)
-        
-        let userName = UILabel()
-        let email = UILabel()
-        let text = UILabel()
         
         userName.text = "Екатерина Новикова"
         userName.textColor = UIColor(named: "YP White")

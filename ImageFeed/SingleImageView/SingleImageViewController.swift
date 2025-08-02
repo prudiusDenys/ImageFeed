@@ -30,7 +30,7 @@ final class SingleImageViewController: UIViewController {
     }
     
     
-    @IBAction func singeShareButton(_ sender: UIButton) {
+    @IBAction private func singeShareButton(_ sender: UIButton) {
         guard let image else { return }
         
         let share = UIActivityViewController(
