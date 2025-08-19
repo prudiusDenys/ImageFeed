@@ -1,7 +1,7 @@
 import UIKit
 import WebKit
 
-enum WebViewConstants {
+private enum WebViewConstants {
     static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
 }
 
@@ -11,8 +11,8 @@ protocol WebViewControllerDelegate: AnyObject {
 }
 
 final class WebViewController: UIViewController {
-    @IBOutlet private var webView: WKWebView!
-    @IBOutlet private var progressView: UIProgressView!
+    @IBOutlet private weak var webView: WKWebView!
+    @IBOutlet private weak var progressView: UIProgressView!
     
     weak var delegate: WebViewControllerDelegate?
 
@@ -20,7 +20,6 @@ final class WebViewController: UIViewController {
         super.viewDidLoad()
         
         webView.navigationDelegate = self
-        
         loadAuthView()
     }
     
@@ -76,7 +75,6 @@ final class WebViewController: UIViewController {
         updateProgress()
     }
 }
-
 
 extension WebViewController: WKNavigationDelegate {
     func webView(

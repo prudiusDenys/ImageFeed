@@ -5,7 +5,7 @@ protocol AuthViewControllerDelegate: AnyObject {
 }
 
 final class AuthViewController: UIViewController {
-    private let ShowWebViewSegueIdentifier = "ShowWebView"
+    private let segueToWebView = "ShowWebView"
     private let oauth2Service = OAuth2Service.shared
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     
@@ -18,17 +18,17 @@ final class AuthViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == ShowWebViewSegueIdentifier {
-            guard
-                let webViewController = segue.destination as? WebViewController
-            else {
-                assertionFailure("Failed to prepare for \(ShowWebViewSegueIdentifier)")
-                return
-            }
-            webViewController.delegate = self
-        } else {
+        guard segue.identifier == segueToWebView else {
             super.prepare(for: segue, sender: sender)
+            return
         }
+
+        guard let webVC = segue.destination as? WebViewController else {
+            assertionFailure("Expected WebViewController as destination for segue '\(segueToWebView)'")
+            return
+        }
+
+        webVC.delegate = self
     }
     
     private func configureBackButton() {

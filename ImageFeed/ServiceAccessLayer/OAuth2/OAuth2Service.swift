@@ -1,19 +1,5 @@
 import Foundation
 
-struct OAuthTokenResponseBody: Codable {
-    let accessToken: String
-    let tokenType: String
-    let scope: String
-    let createdAt: Date
-    
-    private enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
-        case tokenType = "token_type"
-        case scope
-        case createdAt = "created_at"
-    }
-}
-
 final class OAuth2Service {
     static let shared = OAuth2Service()
     private init() {}
