@@ -5,30 +5,29 @@ protocol AuthViewControllerDelegate: AnyObject {
 }
 
 final class AuthViewController: UIViewController {
-    private let segueToWebView = "ShowWebView"
+    private let showWebViewSegueIdentifier = "ShowWebView"
     private let oauth2Service = OAuth2Service.shared
-    private let oAuth2TokenStorage = OAuth2TokenStorage()
     
     weak var delegate: AuthViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.configureBackButton()
+        configureBackButton()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard segue.identifier == segueToWebView else {
+        if segue.identifier == showWebViewSegueIdentifier {
+            guard
+                let webViewController = segue.destination as? WebViewController
+            else {
+                assertionFailure("Failed to prepare for \(showWebViewSegueIdentifier)")
+                return
+            }
+            webViewController.delegate = self
+        } else {
             super.prepare(for: segue, sender: sender)
-            return
         }
-
-        guard let webVC = segue.destination as? WebViewController else {
-            assertionFailure("Expected WebViewController as destination for segue '\(segueToWebView)'")
-            return
-        }
-
-        webVC.delegate = self
     }
     
     private func configureBackButton() {
@@ -41,16 +40,25 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewControllerDelegate {
     func webViewController(_ vc: WebViewController, didAuthenticateWithCode code: String) {
-        oauth2Service.fetchOAuthToken(code: code) { [weak self] result in
-            guard let self = self else { return }
-            
+
+        // Скрываем WebViewController
+        vc.dismiss(animated: true)
+
+        // Показываем индикатор загрузки
+        UIBlockingProgressHUD.show()
+
+        fetchOAuthToken(code) { [weak self] result in
+            // Скрываем индикатор загрузки
+            UIBlockingProgressHUD.dismiss()
+            print(result)
+            guard let self else { return }
+
             switch result {
-                case .success(let result):
-                oAuth2TokenStorage.token = result.accessToken
+            case .success:
                 self.delegate?.didAuthenticate(self)
-            case .failure:
-                // TODO
-                break
+            case let .failure(error):
+                print("Ошибка при аутентификации: \(error.localizedDescription)")
+                self.showAuthErrorAlert()  // Показываем алерт при ошибке
             }
         }
     }
@@ -60,3 +68,23 @@ extension AuthViewController: WebViewControllerDelegate {
     }
 }
 
+extension AuthViewController {
+    private func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        oauth2Service.fetchOAuthToken(code) { result in
+            completion(result)
+        }
+    }
+}
+
+extension AuthViewController {
+    func showAuthErrorAlert() {
+        let alertController = UIAlertController(
+            title: "Что-то пошло не так",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert
+        )
+        let okAction = UIAlertAction(title: "Ок", style: .default, handler: nil)
+        alertController.addAction(okAction)
+        present(alertController, animated: true, completion: nil)
+    }
+}
