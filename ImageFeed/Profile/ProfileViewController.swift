@@ -12,8 +12,20 @@ final class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        SetupUI()
-        
+        setupUI()
+        configureBindings()
+        updateAvatar()
+    }
+    
+    private func setupUI() {
+        view.backgroundColor = UIColor(named: "YP Black")
+        setupAvatarView()
+        setupNameLabel()
+        setupDescriptionLabel()
+        setupLogoutButton()
+    }
+    
+    private func configureBindings() {
         if let profile = ProfileService.shared.profile {
             updateProfileDetails(profile: profile)
         }
@@ -27,16 +39,6 @@ final class ProfileViewController: UIViewController {
                 guard let self = self else { return }
                 self.updateAvatar()
             }
-
-        updateAvatar()
-    }
-    
-    private func SetupUI() {
-        view.backgroundColor = UIColor(named: "YP Black")
-        setupAvatarView()
-        setupNameLabel()
-        setupDescriptionLabel()
-        setupLogoutButton()
     }
     
     private func setupAvatarView() {
