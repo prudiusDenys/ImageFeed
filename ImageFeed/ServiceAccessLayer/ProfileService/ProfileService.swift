@@ -22,6 +22,7 @@ struct ProfileResult: Codable {
 }
 
 final class ProfileService {
+    // MARK: Singleton
     static let shared = ProfileService()
     private init() {}
 
